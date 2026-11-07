@@ -6,7 +6,7 @@ export const contato = [
     },
     {
         id: 2,
-        nome: "Gabs",
+        nome: "Gabss",
         numero: "(88) 99775-9477"
     },
     {
