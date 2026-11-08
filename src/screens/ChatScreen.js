@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     FlatList,
@@ -7,15 +7,33 @@ import {
     Text,
     StyleSheet,
     KeyboardAvoidingView,
+    Keyboard,
     Platform,
-    SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Mensagem } from '../components/Mensagem';
 import { mensagemService } from '../services/MensagemService';
 import { colors } from '../theme/colors';
 
 export function ChatScreen({ route }) {
     const { contatoId, nome } = route.params || {};
+    const insets = useSafeAreaInsets();
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+    useEffect(() => {
+        const showSub = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+            () => setKeyboardVisible(true)
+        );
+        const hideSub = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+            () => setKeyboardVisible(false)
+        );
+        return () => {
+            showSub.remove();
+            hideSub.remove();
+        };
+    }, []);
 
     const [mensagens, setMensagens] = useState(
         contatoId ? mensagemService.getMensagens(contatoId) : []
@@ -34,66 +52,64 @@ export function ChatScreen({ route }) {
         }
     }
 
-    return (
-        <SafeAreaView style={styles.safeArea}>
-            <KeyboardAvoidingView
-                style={styles.container}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-            >
-                <FlatList
-                    data={mensagens}
-                    keyExtractor={(item) => String(item.id)}
-                    renderItem={({ item }) => (
-                        <Mensagem
-                            mensagem={item.texto}
-                            recebida={item.recebida}
-                        />
-                    )}
-                    contentContainerStyle={styles.listaMensagens}
-                    ListEmptyComponent={
-                        <View style={styles.vazioContainer}>
-                            <Text style={styles.vazioTexto}>
-                                Nenhuma mensagem com {nome || 'este contato'}.
-                            </Text>
-                            <Text style={styles.vazioSubtexto}>
-                                Envie uma mensagem para iniciar a conversa!
-                            </Text>
-                        </View>
-                    }
-                />
+    const bottomPadding = !isKeyboardVisible && insets.bottom > 0
+        ? insets.bottom
+        : 10;
 
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Digite uma mensagem..."
-                        placeholderTextColor={colors.textSecondary}
-                        value={texto}
-                        onChangeText={setTexto}
-                        multiline
+    return (
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
+            <FlatList
+                data={mensagens}
+                keyExtractor={(item) => String(item.id)}
+                renderItem={({ item }) => (
+                    <Mensagem
+                        mensagem={item.texto}
+                        recebida={item.recebida}
                     />
-                    <TouchableOpacity
-                        style={[
-                            styles.botaoEnviar,
-                            !texto.trim() && styles.botaoDesabilitado,
-                        ]}
-                        onPress={handleEnviar}
-                        disabled={!texto.trim()}
-                        activeOpacity={0.7}
-                    >
-                        <Text style={styles.textoBotaoEnviar}>Enviar</Text>
-                    </TouchableOpacity>
-                </View>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+                )}
+                contentContainerStyle={styles.listaMensagens}
+                ListEmptyComponent={
+                    <View style={styles.vazioContainer}>
+                        <Text style={styles.vazioTexto}>
+                            Nenhuma mensagem com {nome || 'este contato'}.
+                        </Text>
+                        <Text style={styles.vazioSubtexto}>
+                            Envie uma mensagem para iniciar a conversa!
+                        </Text>
+                    </View>
+                }
+            />
+
+            <View style={[styles.inputContainer, { paddingBottom: bottomPadding }]}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Digite uma mensagem..."
+                    placeholderTextColor={colors.textSecondary}
+                    value={texto}
+                    onChangeText={setTexto}
+                    multiline
+                />
+                <TouchableOpacity
+                    style={[
+                        styles.botaoEnviar,
+                        !texto.trim() && styles.botaoDesabilitado,
+                    ]}
+                    onPress={handleEnviar}
+                    disabled={!texto.trim()}
+                    activeOpacity={0.7}
+                >
+                    <Text style={styles.textoBotaoEnviar}>Enviar</Text>
+                </TouchableOpacity>
+            </View>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: colors.chatBackground,
-    },
     container: {
         flex: 1,
         backgroundColor: colors.chatBackground,
@@ -125,7 +141,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-end',
         paddingHorizontal: 12,
-        paddingVertical: 8,
+        paddingTop: 8,
         backgroundColor: colors.background,
         borderTopWidth: StyleSheet.hairlineWidth,
         borderTopColor: colors.border,
