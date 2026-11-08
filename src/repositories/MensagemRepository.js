@@ -2,7 +2,6 @@ export class MensagemRepository {
     constructor() {
         this.mensagens = [
             { id: 1, contatoId: 1, texto: "Oi! Tudo bem?", recebida: true },
-            { id: 2, contatoId: 1, texto: "Oi Emi! Tudo bem e com você?", recebida: false },
             { id: 3, contatoId: 2, texto: "E aí! Já fez a atividade de mobile?", recebida: true },
             { id: 4, contatoId: 3, texto: "Olá! Vamos estudar hoje?", recebida: true },
             { id: 5, contatoId: 4, texto: "Boa tarde! Me avisa quando puder falar.", recebida: true },
