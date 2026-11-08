@@ -29,7 +29,6 @@ export function ChatScreen({ route }) {
 
         const novaMensagem = mensagemService.enviarMensagem(contatoId, texto);
         if (novaMensagem) {
-            // Atualiza o estado com as mensagens do contato selecionado
             setMensagens([...mensagemService.getMensagens(contatoId)]);
             setTexto('');
         }

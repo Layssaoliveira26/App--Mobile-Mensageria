@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { HomeScreen } from './src/screens/HomeScreen';
+import { ChatScreen } from './src/screens/ChatScreen';
 import { colors } from './src/theme/colors';
 
 const Stack = createStackNavigator();
@@ -31,6 +32,13 @@ export default function App() {
             name="HomeScreen"
             component={HomeScreen}
             options={{ title: 'Mensagens' }}
+          />
+          <Stack.Screen
+            name="ChatScreen"
+            component={ChatScreen}
+            options={({ route }) => ({
+              title: route.params?.nome || 'Conversa',
+            })}
           />
         </Stack.Navigator>
       </NavigationContainer>
