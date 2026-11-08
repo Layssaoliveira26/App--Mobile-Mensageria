@@ -1,4 +1,4 @@
-export const contato = [
+export const contatos = [
     {
         id: 1,
         nome: "Emi",
@@ -18,5 +18,13 @@ export const contato = [
         id: 4,
         nome: "Cicin",
         numero: "(88) 99784-8056"
+    },
+    {
+        id: 5,
+        nome: "Kawan",
+        numero: "(88) 99723-1122"
     }
-]
+];
+
+// Compatibilidade caso algum arquivo importe no singular
+export const contato = contatos;

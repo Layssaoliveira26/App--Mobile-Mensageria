@@ -1,28 +1,30 @@
-import { MensagemRepository } from "../repositories/MensagemRepoitory";
+import { MensagemRepository } from "../repositories/MensagemRepository.js";
 
 export class MensagemService {
-
-    constructor() {
-        this.repository = new MensagemRepository();
+    constructor(repository = new MensagemRepository()) {
+        this.repository = repository;
     }
 
-    getMensagens(contatoID) {
-        return this.repository.getMensagens(contatoID);
+    getMensagens(contatoId) {
+        return this.repository.getMensagens(contatoId);
     }
 
-    enviarMensagem(contatoID, texto) {
-        if (!texto.trim()) {
-            return;
+    enviarMensagem(contatoId, texto) {
+        if (!texto || !texto.trim()) {
+            return null;
         }
 
-        const mensagem = {
+        const novaMensagem = {
             id: Date.now(),
-            contatoID: contatoID,
-            texto:texto,
-            recebida: recebida
-        }
+            contatoId: contatoId,
+            texto: texto.trim(),
+            recebida: false,
+        };
 
-
-        this.repository.adicionarMensagem(mensagem)
+        this.repository.adicionarMensagem(novaMensagem);
+        return novaMensagem;
     }
 }
+
+// Instância única para compartilhamento de dados em memória entre telas
+export const mensagemService = new MensagemService();
